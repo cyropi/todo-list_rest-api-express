@@ -47,9 +47,4 @@ export class TodoController
 	}
 
 
-	static async canUserModifyTodo(user, todoId)
-	{
-		let todo = await Todo.findByPk(todoId);
-		return todo && todo.userN === user;
-	}
 }
