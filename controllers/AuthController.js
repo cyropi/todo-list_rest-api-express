@@ -1,21 +1,38 @@
 
-import { TodoController } from '../controllers/TodoController.js';
+import { User } from "../models/Database.js";
+import { generateToken } from "../utils/jwtUtils.js";
 
 
-export async function ensureUsersModifyOnlyOwnTodos(req, res, next)
+export class AuthController
 {
-	const user = req.username;
-	const todoId = req.params.id;
-	
-	const userHasPermission = await TodoController.canUserModifyTodo(user, todoId);
+    static async checkCredentials(req, res) 
+    {
+        let user = new User({ 
+                                userName: req.body.username, // user data specified in the request
+                                password: req.body.password
+                            });
 
-  	if (userHasPermission)
-		next();
- 	else 
-	{
-		next({ 
-			     status: 403, 
-			     message: "Forbidden! You do not have permissions to view or modify this resource." 
-			 });
-  	}
+        let found = await User.findOne({ 
+                                           where: 
+                                           {
+                                               userName: user.userName,
+                                               password: user.password // password was hashed when creating user
+                                           }
+                                        });
+
+        if (found === null)
+            return false;
+        else 
+            return generateToken(user.userName);
+    }
+
+
+    static async saveUser(req, res)
+    {
+        let user = new User({ 
+                                userName: req.body.username, 
+                                password: req.body.password
+                            });
+        return user.save();
+    }
 }
