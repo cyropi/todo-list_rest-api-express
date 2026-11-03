@@ -1,21 +1,20 @@
+import express from "express";
 
-import express from 'express'
-
-import { ResetController } from '../controllers/ResetController.js'
+import { ResetController } from "../controllers/ResetController.js";
 
 
 export const resetRouter = express.Router();
 
+resetRouter.post("/reset", async (req, res, next) =>
+                           {
+                              try
+                              {
+                                 await ResetController.resetApp(req, res);
 
-resetRouter.post('/reset', async (req, res, next) => {
-                                                         try 
-                                                         {
-                                                             await ResetController.resetApp(req, res);
-
-                                                             res.json();
-                                                         } 
-                                                         catch (error) 
-                                                         {
-                                                             next(error);
-                                                         }
-                                                     });
+                                 res.json();
+                              }
+                              catch (error)
+                              {
+                                 next(error);
+                              }
+                           });
